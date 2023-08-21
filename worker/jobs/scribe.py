@@ -10,7 +10,6 @@ from worker.jobs.framework import HordeJobFramework
 from worker.logger import logger
 from worker.stats import bridge_stats
 
-
 class ScribeHordeJob(HordeJobFramework):
     """Process a scribe job from the horde"""
 
@@ -50,21 +49,28 @@ class ScribeHordeJob(HordeJobFramework):
                 f"Prompt length is {len(self.current_payload['prompt'])} characters",
             )
             time_state = time.time()
-            if self.requested_softprompt != self.bridge_data.current_softprompt:
-                requests.put(
-                    self.bridge_data.kai_url + "/api/latest/config/soft_prompt/",
-                    json={"value": self.requested_softprompt},
-                )
-                time.sleep(1)  # Wait a second to unload the softprompt
+            #if self.requested_softprompt != self.bridge_data.current_softprompt:
+            #    requests.put(
+            #        self.bridge_data.kai_url + "/api/latest/config/soft_prompt/",
+            #        json={"value": self.requested_softprompt},
+            #    )
+            #    time.sleep(1)  # Wait a second to unload the softprompt
             loop_retry = 0
             gen_success = False
             while not gen_success and loop_retry < 5:
                 try:
-                    gen_req = requests.post(
-                        self.bridge_data.kai_url + "/api/latest/generate/",
-                        json=self.current_payload,
-                        timeout=300,
-                    )
+                    current_payload["rep_pen"] = None
+                    new_payload = {"prompt": current_payload.pop("prompt"), "n": current_payload.pop("n"),
+                                   "temperature": current_payload.pop("temperature"), "top_p": current_payload.po >
+                    top_k = current_payload.pop('top_k')
+                    if top_k == 0:
+                        top_k = -1
+                    new_payload["top_k"] = top_k
+                    new_payload["max_tokens"] = current_payload.pop('max_length')
+                    gen_req = requests.post(self.bridge_data.kai_url + '/generate', json=new_payload, timeout=300)
+                except (KeyError):
+                    self.status = JobStatus.FAULTED
+                    self.start_submit_thread()
                 except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
                     logger.error(f"Worker {self.bridge_data.kai_url} unavailable. Retrying in 3 seconds...")
                     loop_retry += 1
@@ -107,7 +113,7 @@ class ScribeHordeJob(HordeJobFramework):
                     time.sleep(3)
                     continue
                 try:
-                    self.text = req_json["results"][0]["text"]
+                    self.text = req_json["text"][0]
                 except KeyError:
                     logger.error(
                         (

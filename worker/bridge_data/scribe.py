@@ -33,7 +33,7 @@ class KoboldAIBridgeData(BridgeDataTemplate):
         if hasattr(self, "scribe_name") and not self.args.worker_name:
             self.worker_name = self.scribe_name
         # KAI doesn't support multiple threads
-        self.max_threads = 1
+        self.max_threads = 50
         if args.kai_url:
             self.kai_url = args.kai_url
         if args.sfw:
@@ -56,7 +56,8 @@ class KoboldAIBridgeData(BridgeDataTemplate):
         logger.debug("Retrieving settings from KoboldAI Client...")
         try:
             req = requests.get(self.kai_url + "/api/latest/model")
-            self.model = req.json()["result"]
+            self.model = "Gryphe/MythoMax-L2-13b"
+            self.softprompts = {self.model:[]}
             # Normalize huggingface and local downloaded model names
             if "/" not in self.model:
                 self.model = self.model.replace("_", "/", 1)
@@ -68,8 +69,8 @@ class KoboldAIBridgeData(BridgeDataTemplate):
             if self.model not in self.softprompts:
                 req = requests.get(self.kai_url + "/api/latest/config/soft_prompts_list")
                 self.softprompts[self.model] = [sp["value"] for sp in req.json()["values"]]
-            req = requests.get(self.kai_url + "/api/latest/config/soft_prompt")
-            self.current_softprompt = req.json()["value"]
+            #req = requests.get(self.kai_url + "/api/latest/config/soft_prompt")
+            self.current_softprompt = None
         except requests.exceptions.JSONDecodeError:
             logger.error(f"Server {self.kai_url} is up but does not appear to be a KoboldAI server.")
             self.kai_available = False
