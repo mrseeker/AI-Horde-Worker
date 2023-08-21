@@ -57,6 +57,8 @@ class KoboldAIBridgeData(BridgeDataTemplate):
         try:
             req = requests.get(self.kai_url + "/api/latest/model")
             self.model = "Gryphe/MythoMax-L2-13b"
+            self.max_context_length = 2048
+            self.max_length = 2512
             self.softprompts = {self.model:[]}
             # Normalize huggingface and local downloaded model names
             if "/" not in self.model:
