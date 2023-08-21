@@ -65,7 +65,7 @@ class ScribeHordeJob(HordeJobFramework):
                         top_k = -1
                     new_payload["top_k"] = top_k
                     new_payload["max_tokens"] = self.current_payload.pop('max_length')
-                    gen_req = requests.post(self.bridge_data.kai_url + '/generate', json=new_payload, timeout=300)
+                    gen_req = requests.post(self.bridge_data.kai_url + '/generate', json=new_payload, timeout=30)
                 except (KeyError):
                     self.status = JobStatus.FAULTED
                     self.start_submit_thread()
