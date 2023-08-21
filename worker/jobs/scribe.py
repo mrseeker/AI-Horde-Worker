@@ -112,7 +112,7 @@ class ScribeHordeJob(HordeJobFramework):
                     time.sleep(3)
                     continue
                 try:
-                    self.text = req_json["text"][0]
+                    self.text = " " + req_json["text"][0]
                 except KeyError:
                     logger.error(
                         (
