@@ -59,13 +59,12 @@ class ScribeHordeJob(HordeJobFramework):
             gen_success = False
             while not gen_success and loop_retry < 5:
                 try:
-                    current_payload["rep_pen"] = None
-                    new_payload = {"prompt": current_payload.pop("prompt"), "n": current_payload.pop("n"), "temperature": current_payload.pop("temperature"), "top_p": current_payload.pop("top_p")}
-                    top_k = current_payload.pop('top_k')
+                    new_payload = {"prompt": self.current_payload.pop("prompt"), "n": self.current_payload.pop("n"), "temperature": self.current_payload.pop("temperature"), "top_p": self.current_payload.pop("top_p")}
+                    top_k = self.current_payload.pop('top_k')
                     if top_k == 0:
                         top_k = -1
                     new_payload["top_k"] = top_k
-                    new_payload["max_tokens"] = current_payload.pop('max_length')
+                    new_payload["max_tokens"] = self.current_payload.pop('max_length')
                     gen_req = requests.post(self.bridge_data.kai_url + '/generate', json=new_payload, timeout=300)
                 except (KeyError):
                     self.status = JobStatus.FAULTED
