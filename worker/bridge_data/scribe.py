@@ -54,10 +54,10 @@ class KoboldAIBridgeData(BridgeDataTemplate):
     def validate_kai(self):
         logger.debug("Retrieving settings from KoboldAI Client...")
         try:
-            req = requests.get(self.kai_url + "/api/latest/model")
+            #req = requests.get(self.kai_url + "/api/latest/model")
             self.model = "Gryphe/MythoMax-L2-13b"
             self.max_context_length = 2048
-            self.max_length = 2512
+            self.max_length = 512
             self.softprompts = {self.model:[]}
             # Normalize huggingface and local downloaded model names
             if "/" not in self.model:
