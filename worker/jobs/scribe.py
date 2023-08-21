@@ -61,7 +61,7 @@ class ScribeHordeJob(HordeJobFramework):
                 try:
                     current_payload["rep_pen"] = None
                     new_payload = {"prompt": current_payload.pop("prompt"), "n": current_payload.pop("n"),
-                                   "temperature": current_payload.pop("temperature"), "top_p": current_payload.po >
+                                   "temperature": current_payload.pop("temperature"), "top_p": current_payload.pop("top_p")}
                     top_k = current_payload.pop('top_k')
                     if top_k == 0:
                         top_k = -1
