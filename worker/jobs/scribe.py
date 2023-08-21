@@ -60,8 +60,7 @@ class ScribeHordeJob(HordeJobFramework):
             while not gen_success and loop_retry < 5:
                 try:
                     current_payload["rep_pen"] = None
-                    new_payload = {"prompt": current_payload.pop("prompt"), "n": current_payload.pop("n"),
-                                   "temperature": current_payload.pop("temperature"), "top_p": current_payload.pop("top_p")}
+                    new_payload = {"prompt": current_payload.pop("prompt"), "n": current_payload.pop("n"), "temperature": current_payload.pop("temperature"), "top_p": current_payload.pop("top_p")}
                     top_k = current_payload.pop('top_k')
                     if top_k == 0:
                         top_k = -1
