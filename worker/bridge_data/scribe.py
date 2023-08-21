@@ -33,7 +33,6 @@ class KoboldAIBridgeData(BridgeDataTemplate):
         if hasattr(self, "scribe_name") and not self.args.worker_name:
             self.worker_name = self.scribe_name
         # KAI doesn't support multiple threads
-        self.max_threads = 50
         if args.kai_url:
             self.kai_url = args.kai_url
         if args.sfw:
