@@ -55,7 +55,7 @@ class KoboldAIBridgeData(BridgeDataTemplate):
         logger.debug("Retrieving settings from KoboldAI Client...")
         try:
             #req = requests.get(self.kai_url + "/api/latest/model")
-            self.model = "Gryphe/MythoMax-L2-13b"
+            self.model = "burner/Gryphe/MythoMax-L2-13b"
             self.max_context_length = 2048
             self.max_length = 512
             self.softprompts = {self.model:[]}
