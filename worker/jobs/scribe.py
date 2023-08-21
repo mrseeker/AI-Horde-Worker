@@ -92,7 +92,7 @@ class ScribeHordeJob(HordeJobFramework):
                     time.sleep(3)
                     loop_retry += 1
                     continue
-                if gen_req.status_code == 422:
+                if gen_req.status_code == 500:
                     logger.error(
                         f"KAI instance {self.bridge_data.kai_url} reported validation error.",
                     )
