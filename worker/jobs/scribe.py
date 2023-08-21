@@ -69,6 +69,7 @@ class ScribeHordeJob(HordeJobFramework):
                 except (KeyError):
                     self.status = JobStatus.FAULTED
                     self.start_submit_thread()
+                    return
                 except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
                     logger.error(f"Worker {self.bridge_data.kai_url} unavailable. Retrying in 3 seconds...")
                     loop_retry += 1
