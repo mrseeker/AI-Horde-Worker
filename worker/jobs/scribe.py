@@ -58,7 +58,7 @@ class ScribeHordeJob(HordeJobFramework):
             #    )
             #    time.sleep(1)  # Wait a second to unload the softprompt
             loop_retry = 0
-            new_prompt = None
+            generated_tokens = 0
             gen_success = False
             while not gen_success and loop_retry < 5:
                 try:
@@ -75,6 +75,7 @@ class ScribeHordeJob(HordeJobFramework):
                         top_k = -1
                     new_payload["top_k"] = top_k
                     new_payload["max_tokens"] = self.current_payload.pop('max_length')
+                    generated_tokens = new_payload["max_tokens"]
                     gen_req = requests.post(self.bridge_data.kai_url + '/generate', json=new_payload, timeout=60)
                 except (KeyError):
                     self.status = JobStatus.FAULTED
@@ -139,7 +140,7 @@ class ScribeHordeJob(HordeJobFramework):
             logger.info(
                 f"Generation for id {self.current_id} finished successfully"
                 f" in {round(time.time() - time_state,1)} seconds."
-                f"Token generation time: {len(new_prompt) / round(time.time() - time_state,2)} T/s",
+                f"Token generation time: {round(len(generated_tokens) / (time.time() - time_state),2)} T/s",
             )
         except Exception as err:
             stack_payload = gen_payload
