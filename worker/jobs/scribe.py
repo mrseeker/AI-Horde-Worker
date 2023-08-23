@@ -64,7 +64,7 @@ class ScribeHordeJob(HordeJobFramework):
                     new_prompt_original = self.current_payload.pop("prompt")
                     new_prompt = self.tokenizer.encode(new_prompt_original)
                     if (len(new_prompt) > 4096):
-                        new_prompt = new_prompt[len(new_prompt) - 4097:]
+                        new_prompt = new_prompt[len(new_prompt) - 4095:]
                         new_prompt = self.tokenizer.decode(new_prompt[1:])
                     else:
                         new_prompt = new_prompt_original
