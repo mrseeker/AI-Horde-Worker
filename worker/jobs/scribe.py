@@ -58,6 +58,7 @@ class ScribeHordeJob(HordeJobFramework):
             #    )
             #    time.sleep(1)  # Wait a second to unload the softprompt
             loop_retry = 0
+            new_prompt = None
             gen_success = False
             while not gen_success and loop_retry < 5:
                 try:
@@ -137,7 +138,8 @@ class ScribeHordeJob(HordeJobFramework):
             self.seed = 0
             logger.info(
                 f"Generation for id {self.current_id} finished successfully"
-                f" in {round(time.time() - time_state,1)} seconds.",
+                f" in {round(time.time() - time_state,1)} seconds."
+                f"Token generation time: {len(new_prompt) / round(time.time() - time_state,2)} T/s",
             )
         except Exception as err:
             stack_payload = gen_payload
