@@ -9,6 +9,7 @@ from worker.enums import JobStatus
 from worker.jobs.framework import HordeJobFramework
 from worker.logger import logger
 from worker.stats import bridge_stats
+from transformers import AutoTokenizer
 
 class ScribeHordeJob(HordeJobFramework):
     """Process a scribe job from the horde"""
@@ -25,6 +26,7 @@ class ScribeHordeJob(HordeJobFramework):
         self.current_payload["quiet"] = True
         self.requested_softprompt = self.current_payload.get("softprompt")
         self.censored = None
+        self.tokenizer = AutoTokenizer.from_pretrained("Gryphe/MythoMax-L2-13b")
 
     @logger.catch(reraise=True)
     def start_job(self):
@@ -59,13 +61,18 @@ class ScribeHordeJob(HordeJobFramework):
             gen_success = False
             while not gen_success and loop_retry < 5:
                 try:
-                    new_payload = {"prompt": self.current_payload.pop("prompt"), "n": self.current_payload.pop("n"), "temperature": self.current_payload.pop("temperature"), "top_p": self.current_payload.pop("top_p")}
+                    new_prompt = self.current_payload.pop("prompt")
+                    new_prompt = self.tokenizer.encode(new_prompt)
+                    if (len(new_prompt) > 4096):
+                        new_prompt = new_prompt[len(new_prompt) - 4096:]
+                    new_prompt = self.tokenizer.decode(new_prompt[1:])
+                    new_payload = {"prompt": new_prompt, "n": self.current_payload.pop("n"), "temperature": self.current_payload.pop("temperature"), "top_p": self.current_payload.pop("top_p")}
                     top_k = self.current_payload.pop('top_k')
                     if top_k == 0:
                         top_k = -1
                     new_payload["top_k"] = top_k
                     new_payload["max_tokens"] = self.current_payload.pop('max_length')
-                    gen_req = requests.post(self.bridge_data.kai_url + '/generate', json=new_payload, timeout=30)
+                    gen_req = requests.post(self.bridge_data.kai_url + '/generate', json=new_payload, timeout=60)
                 except (KeyError):
                     self.status = JobStatus.FAULTED
                     self.start_submit_thread()
