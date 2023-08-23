@@ -61,11 +61,13 @@ class ScribeHordeJob(HordeJobFramework):
             gen_success = False
             while not gen_success and loop_retry < 5:
                 try:
-                    new_prompt = self.current_payload.pop("prompt")
-                    new_prompt = self.tokenizer.encode(new_prompt)
+                    new_prompt_original = self.current_payload.pop("prompt")
+                    new_prompt = self.tokenizer.encode(new_prompt_original)
                     if (len(new_prompt) > 4096):
-                        new_prompt = new_prompt[len(new_prompt) - 4096:]
-                    new_prompt = self.tokenizer.decode(new_prompt[1:])
+                        new_prompt = new_prompt[len(new_prompt) - 4097:]
+                        new_prompt = self.tokenizer.decode(new_prompt[1:])
+                    else:
+                        new_prompt = new_prompt_original
                     new_payload = {"prompt": new_prompt, "n": self.current_payload.pop("n"), "temperature": self.current_payload.pop("temperature"), "top_p": self.current_payload.pop("top_p")}
                     top_k = self.current_payload.pop('top_k')
                     if top_k == 0:
