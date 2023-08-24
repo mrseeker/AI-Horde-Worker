@@ -74,16 +74,17 @@ class ScribeHordeJob(HordeJobFramework):
                         top_k = -1
                     new_payload["top_k"] = top_k
                     new_payload["max_tokens"] = self.current_payload.pop('max_length')
-                    gen_req = requests.post(self.bridge_data.kai_url + '/generate', json=new_payload, timeout=60)
+                    gen_req = requests.post(self.bridge_data.kai_url + '/generate', json=new_payload, timeout=300)
                 except (KeyError):
                     self.status = JobStatus.FAULTED
                     self.start_submit_thread()
                     return
                 except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
-                    logger.error(f"Worker {self.bridge_data.kai_url} unavailable. Retrying in 3 seconds...")
-                    loop_retry += 1
-                    time.sleep(3)
-                    continue
+                    logger.error(f"Worker {self.bridge_data.kai_url} unavailable. Waiting 60s to clear up queue.")
+                    self.status = JobStatus.FAULTED
+                    self.start_submit_thread()
+                    time.sleep(60)
+                    return
                 if type(gen_req.json()) is not dict:
                     logger.error(
                         (
